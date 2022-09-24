@@ -5,7 +5,12 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/hello/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/hello/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/hello-01/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/hello-01/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/02_echor/echor/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/hello/target" />
+      <excludeFolder url="file://$MODULE_DIR$/hello-01/target" />
+      <excludeFolder url="file://$MODULE_DIR$/02_echor/echor/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
