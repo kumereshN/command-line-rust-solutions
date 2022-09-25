@@ -24,5 +24,5 @@ fn main() {
     let omit_newline = matches.is_present("omit_newline");
 
     // Joins the strings in the vector from text variable
-    println!("{}{}", text.join(" "), if omit_newline { "" } else { "\n" });
+    print!("{}{}", text.join(" "), if omit_newline { "" } else { "\n" });
 }
