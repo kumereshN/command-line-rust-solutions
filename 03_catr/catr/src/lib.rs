@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::fs;
 use clap::{App, Arg};
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
@@ -18,7 +19,7 @@ pub fn run(config: Config) -> MyResult<()> {
     for filename in config.files{
         match open(&filename){
             Err(err) => eprintln!("Failed to open {}: {}", filename, err),
-            Ok(_) => println!("Opened {}", filename),
+            Ok(_) => println!("{:?}", read_file_string(&filename))
         }
     }
     Ok(())
@@ -65,4 +66,15 @@ fn open(filename: &str) -> MyResult<Box<dyn BufRead>>{
         "-" => Ok(Box::new(BufReader::new(io::stdin()))),
         _ => Ok(Box::new(BufReader::new(File::open(filename)?))),
     }
+}
+
+fn read_file_string(filename: &str) -> MyResult<()>{
+    let file = File::open(filename)?;
+    let reader = BufReader::new(file);
+
+    for line in reader.lines(){
+        println!("{}", line?);
+    }
+
+    Ok(())
 }
