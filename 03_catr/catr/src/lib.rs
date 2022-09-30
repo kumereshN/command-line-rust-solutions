@@ -19,7 +19,7 @@ pub fn run(config: Config) -> MyResult<()> {
     for filename in config.files{
         match open(&filename){
             Err(err) => eprintln!("Failed to open {}: {}", filename, err),
-            Ok(_) => read_file_string(&filename)?,
+            Ok(_) => read_file_string(&filename, &config.number_lines, &config.number_nonblank_lines)?,
         }
     }
     Ok(())
@@ -68,12 +68,24 @@ fn open(filename: &str) -> MyResult<Box<dyn BufRead>>{
     }
 }
 
-fn read_file_string(filename: &str) -> MyResult<()> {
+fn read_file_string(filename: &str, no_of_lines: &bool, no_of_blank_lines: &bool) -> MyResult<()> {
     let file = File::open(filename)?;
     let reader = BufReader::new(file);
 
-    for line in reader.lines(){
-        println!("{}", line?);
+    if *no_of_lines{
+        for (index, line) in reader.lines().enumerate(){
+            let line = line.unwrap();
+            println!("\t{} {}", index+1, line);
+        }
+    } else if *no_of_blank_lines{
+        println!("Placeholder");
+        }
+    else{
+        for line in reader.lines(){
+            let line = line.unwrap();
+            println!("{}", line);
+        }
     }
+
     Ok(())
 }
