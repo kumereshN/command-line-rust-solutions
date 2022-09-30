@@ -75,11 +75,22 @@ fn read_file_string(filename: &str, no_of_lines: &bool, no_of_blank_lines: &bool
     if *no_of_lines{
         for (index, line) in reader.lines().enumerate(){
             let line = line.unwrap();
-            println!("\t{} {}", index+1, line);
+            println!("\t{}  {}", index+1, line);
         }
     } else if *no_of_blank_lines{
-        println!("Placeholder");
+        let mut index: i32 = 1;
+        for line in reader.lines(){
+            let line = line.unwrap();
+            if line.is_empty(){
+                println!();
+                continue
+            } else{
+                println!("\t{} {}", index, line);
+                index += 1;
+            }
+
         }
+    }
     else{
         for line in reader.lines(){
             let line = line.unwrap();
