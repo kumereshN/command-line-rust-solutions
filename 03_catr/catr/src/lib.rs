@@ -18,7 +18,26 @@ pub fn run(config: Config) -> MyResult<()> {
     for filename in config.files{
         match open(&filename){
             Err(err) => eprintln!("Failed to open {}: {}", filename, err),
-            Ok(_) => read_file_string(&filename, &config.number_lines, &config.number_nonblank_lines)?,
+            // file is a user declared variable
+            // this is from the open function
+            Ok(file) => {
+                let mut last_num = 0;
+                for (line_num, line) in file.lines().enumerate(){
+                    let line = line?;
+                    if config.number_lines{
+                        println!("{:>6}\t{}", line_num + 1, line);
+                    } else if config.number_nonblank_lines{
+                        if !line.is_empty(){
+                            last_num += 1;
+                            println!("{:>6}\t{}", last_num, line);
+                        } else {
+                            println!();
+                        }
+                    } else{
+                        println!("{}", line);
+                    }
+                }
+            }
         }
     }
     Ok(())
@@ -63,39 +82,7 @@ pub fn get_args() -> MyResult<Config>{
 fn open(filename: &str) -> MyResult<Box<dyn BufRead>>{
     match filename {
         "-" => Ok(Box::new(BufReader::new(io::stdin()))),
+        // "_" is a catch-all, this opens the filename
         _ => Ok(Box::new(BufReader::new(File::open(filename)?))),
     }
-}
-
-fn read_file_string(filename: &str, no_of_lines: &bool, no_of_blank_lines: &bool) -> MyResult<()> {
-    let file = File::open(filename)?;
-    let reader = BufReader::new(file);
-
-    if *no_of_lines{
-        for (index, line) in reader.lines().enumerate(){
-            let line = line.unwrap();
-            println!("     {}	{}", index+1, line);
-        }
-    } else if *no_of_blank_lines{
-        let mut index: i32 = 1;
-        for line in reader.lines(){
-            let line = line.unwrap();
-            if line.is_empty(){
-                println!();
-                continue
-            } else{
-                println!("     {}	{}", index, line);
-                index += 1;
-            }
-
-        }
-    }
-    else{
-        for line in reader.lines(){
-            let line = line.unwrap();
-            println!("{}", line);
-        }
-    }
-
-    Ok(())
 }
