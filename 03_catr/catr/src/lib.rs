@@ -1,5 +1,4 @@
 use std::error::Error;
-use std::fs;
 use clap::{App, Arg};
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
@@ -43,12 +42,12 @@ pub fn get_args() -> MyResult<Config>{
                 .long("number")
                 .help("Number lines")
                 .takes_value(false)
-                .conflicts_with("number_nonblank"),
+                .conflicts_with("number-nonblank"),
         )
         .arg(
-            Arg::with_name("number_nonblank")
+            Arg::with_name("number-nonblank")
                 .short("b")
-                .long("number_nonblank")
+                .long("number-nonblank")
                 .help("Number non-blank lines")
                 .takes_value(false),
         )
@@ -57,7 +56,7 @@ pub fn get_args() -> MyResult<Config>{
     Ok(Config{
         files: matches.values_of_lossy("files").unwrap(),
         number_lines: matches.is_present("number"),
-        number_nonblank_lines: matches.is_present("number_nonblank"),
+        number_nonblank_lines: matches.is_present("number-nonblank"),
     })
 }
 
@@ -75,7 +74,7 @@ fn read_file_string(filename: &str, no_of_lines: &bool, no_of_blank_lines: &bool
     if *no_of_lines{
         for (index, line) in reader.lines().enumerate(){
             let line = line.unwrap();
-            println!("\t{}  {}", index+1, line);
+            println!("     {}	{}", index+1, line);
         }
     } else if *no_of_blank_lines{
         let mut index: i32 = 1;
@@ -85,7 +84,7 @@ fn read_file_string(filename: &str, no_of_lines: &bool, no_of_blank_lines: &bool
                 println!();
                 continue
             } else{
-                println!("\t{} {}", index, line);
+                println!("     {}	{}", index, line);
                 index += 1;
             }
 
