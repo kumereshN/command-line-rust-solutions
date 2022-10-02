@@ -13,11 +13,14 @@
       <sourceFolder url="file://$MODULE_DIR$/03_catr/catr/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/04_head/headr/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/04_head/headr/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/04_headr/headr/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/04_headr/headr/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/hello/target" />
       <excludeFolder url="file://$MODULE_DIR$/hello-01/target" />
       <excludeFolder url="file://$MODULE_DIR$/02_echor/echor/target" />
       <excludeFolder url="file://$MODULE_DIR$/03_catr/catr/target" />
       <excludeFolder url="file://$MODULE_DIR$/04_head/headr/target" />
+      <excludeFolder url="file://$MODULE_DIR$/04_headr/headr/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
