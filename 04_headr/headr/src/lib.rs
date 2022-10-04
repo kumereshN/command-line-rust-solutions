@@ -100,7 +100,26 @@ pub fn run(config: Config) -> MyResult<()>{
     for filename in config.files{
         match open(&filename){
             Err(err) => eprintln!("{}: {}", filename, err),
-            Ok(_) => eprintln!("Opened {}", filename),
+            Ok(file) => {
+                println!("==> {} <==", filename);
+                let no_of_lines = config.lines;
+                if no_of_lines > 0{
+                    for (line_no, line) in file.lines().enumerate(){
+                        if line_no == no_of_lines{
+                            break
+                        }
+                        else{
+                            println!("{}", line?);
+                        }
+                    }
+                }
+                else{
+                    for line in file.lines(){
+                        println!("{}", line?);
+                    }
+                }
+                println!();
+            }
         }
     }
     Ok(())
