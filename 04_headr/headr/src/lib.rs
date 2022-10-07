@@ -100,25 +100,17 @@ pub fn run(config: Config) -> MyResult<()>{
     for filename in config.files{
         match open(&filename){
             Err(err) => eprintln!("{}: {}", filename, err),
-            Ok(file) => {
-                println!("==> {} <==", filename);
-                let no_of_lines = config.lines;
-                if no_of_lines > 0{
-                    for (line_no, line) in file.lines().enumerate(){
-                        if line_no == no_of_lines{
-                            break
-                        }
-                        else{
-                            println!("{}", line?);
-                        }
+            Ok(mut file) => {
+                let mut line = String::new();
+                for _ in 0..config.lines{
+                    let bytes = file.read_line(&mut line)?;
+                    if bytes == 0 {
+                        break;
+
                     }
+                    print!("{}", line);
+                    line.clear();
                 }
-                else{
-                    for line in file.lines(){
-                        println!("{}", line?);
-                    }
-                }
-                println!();
             }
         }
     }
