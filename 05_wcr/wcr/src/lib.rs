@@ -27,39 +27,55 @@ pub fn get_args() -> MyResult<Config> {
         .arg(
             Arg::with_name("lines")
                 .value_name("LINES")
+                .short("n")
+                .long("lines")
                 .help("Number of lines to display")
                 .takes_value(false)
-                .conflicts_with_all(&["words", "bytes", "chars"])
         )
         .arg(
             Arg::with_name("words")
                 .value_name("WORDS")
+                .short("w")
+                .long("words")
                 .help("Number of words to display")
                 .takes_value(false)
-                .conflicts_with_all(&["lines", "bytes", "chars"])
         )
         .arg(
             Arg::with_name("bytes")
                 .value_name("BYTES")
+                .short("c")
+                .long("bytes")
                 .help("Number of bytes to display")
                 .takes_value(false)
-                .conflicts_with_all(&["lines", "words", "chars"])
         )
         .arg(
             Arg::with_name("chars")
                 .value_name("CHARS")
+                .short("m")
+                .long("chars")
                 .help("Number of chars to display")
                 .takes_value(false)
-                .conflicts_with_all(&["lines", "bytes", "words"])
+                .conflicts_with("bytes")
         )
         .get_matches();
 
+    let mut lines = matches.is_present("lines");
+    let mut words = matches.is_present("words");
+    let mut bytes = matches.is_present("bytes");
+    let chars = matches.is_present("chars");
+
+    if [lines, words, bytes, chars].iter().all(|v| v == &false){
+        lines = true;
+        words = true;
+        bytes = true;
+    }
+
     Ok(Config {
         files: matches.values_of_lossy("files").unwrap(),
-        lines: matches.is_present("lines"),
-        words: matches.is_present("words"),
-        bytes: matches.is_present("bytes"),
-        chars: matches.is_present("chars")
+        lines,
+        words,
+        bytes,
+        chars,
     })
 }
 
