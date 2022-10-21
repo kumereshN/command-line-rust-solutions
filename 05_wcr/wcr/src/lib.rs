@@ -90,18 +90,23 @@ pub fn get_args() -> MyResult<Config> {
 }
 
 pub fn count(mut file: impl BufRead) -> MyResult<FileInfo> {
+    let mut num_lines = 0;
+    let mut num_words = 0;
+    let mut num_bytes = 0;
+    let mut num_chars = 0;
+    let mut line = String::new();
 
-    let mut buf = String::new();
-
-    let num_bytes = file.read_line(&mut buf).unwrap();
-    let num_lines = buf.lines().count();
-    let num_words = { if buf.is_empty(){
-                                0
-                        }
-                        else{
-                            buf.split_whitespace().count()}
-                        };
-    let num_chars = buf.chars().count();
+    loop {
+        let line_bytes = file.read_line(&mut line)?;
+        if line_bytes == 0 {
+            break;
+        }
+        num_bytes += line_bytes;
+        num_lines += 1;
+        num_words += line.split_whitespace().count();
+        num_chars += line.chars().count();
+        line.clear();
+    }
 
     Ok(FileInfo {
         num_lines,
@@ -113,8 +118,10 @@ pub fn count(mut file: impl BufRead) -> MyResult<FileInfo> {
 
 #[cfg(test)]
 mod tests {
+    use std::fmt::format;
     use super::{count, FileInfo};
     use std::io::Cursor;
+    use crate::format_field;
 
     #[test]
     fn test_count(){
@@ -129,6 +136,12 @@ mod tests {
         };
         assert_eq!(info.unwrap(), expected);
     }
+
+    fn test_format_field(){
+        assert_eq!(format_field(1, false), "");
+        assert_eq!(format_field(3, true), "       3");
+        assert_eq!(format_field(10, true), "      10");
+    }
 }
 
 fn open(filename: &str) -> MyResult<Box<dyn BufRead>> {
@@ -138,13 +151,33 @@ fn open(filename: &str) -> MyResult<Box<dyn BufRead>> {
     }
 }
 
+fn format_field(value: usize, show:bool) -> String{
+    if show{
+        format!("{:>8}", value)
+    } else{
+        "".to_string()
+    }
+}
+
 pub fn run(config: Config) -> MyResult<()> {
     for filename in &config.files {
         match open(filename) {
             Err(err) => eprintln!("{}: {}", filename, err),
             Ok(file) => {
-                let r = count(file).unwrap();
-                println!("{:>7} {:>7} {:>7} {}", r.num_lines, r.num_words, r.num_bytes, filename);
+                if let Ok(info) = count(file) {
+                    println!(
+                        "{}{}{}{}{}",
+                        format_field(info.num_lines, config.lines),
+                        format_field(info.num_words, config.words),
+                        format_field(info.num_bytes, config.bytes),
+                        format_field(info.num_chars, config.chars),
+                        if filename == "-"{
+                            "".to_string()
+                        } else {
+                            format!(" {}", filename)
+                        }
+                    );
+                }
             }
         }
     }
