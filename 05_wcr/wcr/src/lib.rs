@@ -37,7 +37,7 @@ pub fn get_args() -> MyResult<Config> {
         .arg(
             Arg::with_name("lines")
                 .value_name("LINES")
-                .short("n")
+                .short("l")
                 .long("lines")
                 .help("Number of lines to display")
                 .takes_value(false)
