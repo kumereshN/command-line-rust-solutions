@@ -1,5 +1,10 @@
 use clap::{App, Arg};
-use std::error::Error;
+use std::{
+    error::Error,
+    fs::File,
+    io::{self, BufRead, BufReader},
+};
+use std::io::Read;
 
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
@@ -18,7 +23,7 @@ pub fn get_args() -> MyResult<Config> {
         .arg(
             Arg::with_name("infile")
                 .value_name("INFILES")
-                .help("Input file(s)")
+                .help("Input file")
                 .default_value("-")
         )
         .arg(
@@ -38,13 +43,30 @@ pub fn get_args() -> MyResult<Config> {
         .get_matches();
 
     Ok(Config{
-        in_file: matches.value_of("infile").unwrap().to_string(),
+        in_file: matches.value_of("infile").map(String::from).unwrap(),
         out_file: matches.value_of("outfile").map(|s| s.to_string()),
         count: matches.is_present("count"),
     })
 }
 
+fn open(filename: &str) -> MyResult<Box<dyn BufRead>> {
+    match filename {
+        "-" => Ok(Box::new(BufReader::new(io::stdin()))),
+        _ => Ok(Box::new(BufReader::new(File::open(filename)?))),
+    }
+}
+
 pub fn run(config: Config) -> MyResult<()> {
-    println!("{:?}", config);
+    let mut file = open(&config.in_file)
+        .map_err(|e| format!("{}: {}", config.in_file, e))?;
+    let mut line = String::new();
+    loop {
+        let bytes = file.read_line(&mut line)?;
+        if bytes == 0 {
+            break;
+        }
+        print!("{}", line);
+        line.clear();
+    }
     Ok(())
 }
