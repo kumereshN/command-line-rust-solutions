@@ -3,6 +3,7 @@ use std::{
     error::Error,
     fs::File,
     io::{self, BufRead, BufReader},
+    collections::HashSet,
 };
 use std::io::Read;
 
@@ -60,13 +61,18 @@ pub fn run(config: Config) -> MyResult<()> {
     let mut file = open(&config.in_file)
         .map_err(|e| format!("{}: {}", config.in_file, e))?;
     let mut line = String::new();
+    let mut seen: HashSet<String> = HashSet::new();
+
     loop {
         let bytes = file.read_line(&mut line)?;
         if bytes == 0 {
             break;
         }
+        // From here, write your code
+        seen.insert(line.strip_suffix('\n').unwrap().to_string());
         print!("{}", line);
         line.clear();
     }
+    print!("{:?}", seen);
     Ok(())
 }
