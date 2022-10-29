@@ -61,7 +61,8 @@ pub fn run(config: Config) -> MyResult<()> {
     let mut file = open(&config.in_file)
         .map_err(|e| format!("{}: {}", config.in_file, e))?;
     let mut line = String::new();
-    let mut seen: HashSet<String> = HashSet::new();
+    let mut cur_ch: String = String::from("");
+    let mut counter = 0;
 
     loop {
         let bytes = file.read_line(&mut line)?;
@@ -69,10 +70,18 @@ pub fn run(config: Config) -> MyResult<()> {
             break;
         }
         // From here, write your code
-        seen.insert(line.strip_suffix('\n').unwrap().to_string());
-        print!("{}", line);
+        let ch = line.strip_suffix('\n').unwrap().to_string();
+        if line == cur_ch {
+            counter += 1
+        }
+        else{
+            print!("{:>4} {}", counter, cur_ch);
+            counter = 0;
+        }
+        cur_ch = ch;
+        // print!("{}", line);
         line.clear();
     }
-    print!("{:?}", seen);
+    // print!("{:#?}", seen);
     Ok(())
 }
