@@ -61,8 +61,8 @@ pub fn run(config: Config) -> MyResult<()> {
     let mut file = open(&config.in_file)
         .map_err(|e| format!("{}: {}", config.in_file, e))?;
     let mut line = String::new();
-    let mut cur_ch: String = String::from("");
-    let mut counter = 0;
+    let mut previous = String::new();
+    let mut count = 0;
 
     loop {
         let bytes = file.read_line(&mut line)?;
@@ -70,18 +70,23 @@ pub fn run(config: Config) -> MyResult<()> {
             break;
         }
         // From here, write your code
-        let ch = line.strip_suffix('\n').unwrap().to_string();
-        if line == cur_ch {
-            counter += 1
+        let cur_ch = line.strip_suffix('\n').unwrap().to_string();
+        if line.trim_end() != previous.trim_end() {
+            if count > 0{
+                
+            }
         }
-        else{
-            print!("{:>4} {}", counter, cur_ch);
+        else if seen.contains(&cur_ch) {
+            counter += 1;
+        }
+        else if !seen.contains(&cur_ch){
+            println!("current char is {:#?} and counter is {}", cur_ch, counter);
             counter = 0;
+            seen.clear();
+            seen.insert(cur_ch);
         }
-        cur_ch = ch;
-        // print!("{}", line);
         line.clear();
     }
-    // print!("{:#?}", seen);
+    println!("Counter is {}", counter);
     Ok(())
 }
