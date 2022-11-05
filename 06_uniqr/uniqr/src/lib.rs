@@ -2,10 +2,8 @@ use clap::{App, Arg};
 use std::{
     error::Error,
     fs::File,
-    io::{self, BufRead, BufReader},
-    collections::HashSet,
+    io::{self, BufRead, BufReader, stdout, Write, Read}
 };
-use std::io::Read;
 
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
@@ -60,9 +58,26 @@ fn open(filename: &str) -> MyResult<Box<dyn BufRead>> {
 pub fn run(config: Config) -> MyResult<()> {
     let mut file = open(&config.in_file)
         .map_err(|e| format!("{}: {}", config.in_file, e))?;
+    let mut out_file: Box<dyn Write> = match &config.out_file {
+        Some(out_name) => Box::new(File::create(out_name)?),
+        _ => Box::new(stdout()),
+    };
     let mut line = String::new();
     let mut previous = String::new();
-    let mut count = 0;
+    let mut count: u64 = 0;
+
+    // Closure
+    let mut print = |count: u64, text: &str| -> MyResult<()> {
+        if count > 0 {
+            if config.count {
+                // write out the contents of count and text to the out_file
+                write!(out_file, "{:>4} {}", count, text)?;
+            } else {
+                write!(out_file, "{}", text)?;
+            }
+        };
+        Ok(())
+    };
 
     loop {
         let bytes = file.read_line(&mut line)?;
@@ -70,23 +85,15 @@ pub fn run(config: Config) -> MyResult<()> {
             break;
         }
         // From here, write your code
-        let cur_ch = line.strip_suffix('\n').unwrap().to_string();
         if line.trim_end() != previous.trim_end() {
-            if count > 0{
-                
-            }
+            print(count, &previous)?;
+            previous = line.clone();
+            count = 0;
         }
-        else if seen.contains(&cur_ch) {
-            counter += 1;
-        }
-        else if !seen.contains(&cur_ch){
-            println!("current char is {:#?} and counter is {}", cur_ch, counter);
-            counter = 0;
-            seen.clear();
-            seen.insert(cur_ch);
-        }
+        count += 1;
         line.clear();
     }
-    println!("Counter is {}", counter);
+
+    print(count, &previous)?;
     Ok(())
 }
